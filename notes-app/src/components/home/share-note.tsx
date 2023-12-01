@@ -3,7 +3,6 @@ import { getSessionToken } from "@descope/react-sdk";
 import { Note } from "../../types";
 import { Button, Dialog, Flex, Text, TextField } from "@radix-ui/themes";
 
-
 export default function ShareNote(props: { note: Note }) {
     const { note } = props;
 
@@ -27,34 +26,33 @@ export default function ShareNote(props: { note: Note }) {
       }
     }
     
-      const [email, setEmail] = useState<undefined | string>(undefined);
-      const [groupId, setGroupId] = useState<undefined | string>(undefined);
-      const [role, setRole] = useState('');
+    const [email, setEmail] = useState<undefined | string>(undefined);
+    const [groupId, setGroupId] = useState<undefined | string>(undefined);
+    const [role, setRole] = useState('');
 
-      // Change handlers for the input fields
-      const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setEmail(event.target.value);
-      };
-    
-      const handleGroupIdChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setGroupId(event.target.value);
-      };
+    const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      setEmail(event.target.value);
+    };
+  
+    const handleGroupIdChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      setGroupId(event.target.value);
+    };
 
-      const handleRoleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setRole(event.target.value);
-      };
-    
-      const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault(); 
+    const handleRoleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      setRole(event.target.value);
+    };
+  
+    const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault(); 
 
-        if (!role) {
-          return;
-        }
-        if (email && groupId) {
-          return;
-        }
-        await shareNote(role, email, groupId);
-      };
+      if (!role) {
+        return;
+      }
+      if (email && groupId) {
+        return;
+      }
+      await shareNote(role, email, groupId);
+    };
     
     return <div>
       <Dialog.Root>
