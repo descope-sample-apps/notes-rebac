@@ -1,12 +1,11 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
 import { Note } from "./types";
-import NoteCardGrid from "../components/home/note-card-grid";
-import NoteCreation from "../components/home/note-creation";
-import NavBar from "../components/layout/navbar";
+import NoteCardGrid from "./components/home/note-card-grid";
+import NoteCreation from "./components/home/note-creation";
+import NavBar from "./components/layout/navbar";
 
 import {
-  useDescope,
   useSession,
   useUser,
   getSessionToken,
@@ -15,14 +14,8 @@ import { Descope } from "@descope/react-sdk";
 
 function App() {
   const { isAuthenticated, isSessionLoading } = useSession();
-  const { user, isUserLoading } = useUser();
-  const { logout } = useDescope();
+  const { isUserLoading } = useUser();
   const [notes, setNotes] = useState<Note[]>([]);
-
- 
-
- 
-
 
   const fetchNotes = async () => {
       try {
@@ -48,24 +41,23 @@ function App() {
       }
     }, [isAuthenticated]);
 
-  const handleLogout = useCallback(() => {
-    logout();
-  }, [logout]);
-
+  
   if (isSessionLoading || isUserLoading) {
     return <p>Loading...</p>;
   }
 
   if (!isAuthenticated) {
-    return  <Descope
-      flowId="sign-up-or-in"
-      theme="dark"
-      onError={(e) => console.log("Could not log in!" + e)}
-    />;
+    return  <div className="max-w-xs rounded-md overflow-hidden m-auto border border-gray-200">
+      <Descope
+        flowId="sign-up-or-in"
+        // theme="light"
+        onError={(e) => console.log("Could not log in!" + e)}
+      />
+    </div>;
   }
 
   return (
-    <div className="w-full">
+    <div className="text-left">
        <NavBar/>
 
        <NoteCreation
@@ -77,12 +69,6 @@ function App() {
         setNotes={setNotes}
         notes={notes}
        />
-        
-      <div className="user">
-        <span>
-          {user.name} <button onClick={handleLogout}>Logout</button>
-        </span>
-      </div>
     </div>
   );
 }
