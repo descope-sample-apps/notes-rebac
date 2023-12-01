@@ -1,5 +1,6 @@
 import { getSessionToken } from "@descope/react-sdk";
 import { Note } from "../../src/types";
+import ShareNote from "./share-note";
 
 
 export default function NoteCardGrid(props: { notes: Note[], setNotes: (notes: Note[]) => void }) {
@@ -26,6 +27,7 @@ export default function NoteCardGrid(props: { notes: Note[], setNotes: (notes: N
         <div key={i} className="note-item bg-black">
             <div className="notes-header">
             <button onClick={() => deleteNote(note.id)}>x</button>
+            <ShareNote note={note} />
             </div>
             <h2>{note.title}</h2>
             <p>{note.content}</p>
