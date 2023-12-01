@@ -1,0 +1,40 @@
+{
+  "name": "notes-rebac",
+  "version": "1.0.0",
+  "description": "Descope notes demo showing FGA",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "fe": "cd notes-app && npm run dev",
+    "be": "cd notes-app-server && npm start",
+    "dev": "concurrently \"npm run fe\" \"npm run be\"",
+    "prepare": "husky install",
+    "postinstall": "concurrently \"cd notes-app && npm i\" \"cd notes-app-server && npm i\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/descope-sample-apps/notes-rebac.git"
+  },
+  "keywords": [
+    "fga",
+    "rebac",
+    "descope"
+  ],
+  "author": "Descope, Inc.",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/descope-sample-apps/notes-rebac/issues"
+  },
+  "homepage": "https://github.com/descope-sample-apps/notes-rebac#readme",
+  "dependencies": {
+    "concurrently": "^7.6.0"
+  },
+  "devDependencies": {
+    "husky": "^8.0.3",
+    "lint-staged": "^15.0.0",
+    "prettier": "3.0.3"
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
+  }
+}
