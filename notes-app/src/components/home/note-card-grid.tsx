@@ -34,8 +34,6 @@ export default function NoteCardGrid(props: { notes: Note[], setNotes: (notes: N
           <h2 className="font-bold">{note.title}</h2>
           <p className="">{note.content}</p>
         </div>
-        
-
       </div>
     ))}
 </div>

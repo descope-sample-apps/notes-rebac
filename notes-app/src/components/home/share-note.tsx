@@ -44,10 +44,15 @@ export default function ShareNote(props: { note: Note }) {
         setRole(event.target.value);
       };
     
-      // Modified createNote function
       const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault(); // Prevents the default form submission behavior
-        // Add logic here to create the note
+        event.preventDefault(); 
+
+        if (!role) {
+          return;
+        }
+        if (email && groupId) {
+          return;
+        }
         await shareNote(role, email, groupId);
       };
     
@@ -62,18 +67,18 @@ export default function ShareNote(props: { note: Note }) {
         <Dialog.Content style={{ maxWidth: 450 }}>
           <Dialog.Title>Share Note</Dialog.Title>
           <Dialog.Description size="2" mb="4">
-            Shares the note with a user or group.
+            Shares the note with a user or group. Please enter either the Group ID or email, but not both.
           </Dialog.Description>
           <form onSubmit={onSubmit}>
 
             <Flex direction="column" gap="3">
               <label>
                 <Text as="div" size="2" mb="1" weight="bold">
-                  Role
+                  Role*
                 </Text>
                 <TextField.Input
                   onChange={handleRoleChange}
-                  placeholder="Enter title"
+                  placeholder="Enter role"
                 />
               </label>
               <label>
@@ -82,7 +87,7 @@ export default function ShareNote(props: { note: Note }) {
                 </Text>
                 <TextField.Input
                   onChange={handleGroupIdChange}
-                  placeholder="Write your note here..."
+                  placeholder="Enter the Group ID here..."
                 />
               </label>
               <label>
@@ -91,7 +96,7 @@ export default function ShareNote(props: { note: Note }) {
                 </Text>
                 <TextField.Input
                   onChange={handleEmailChange}
-                  placeholder="Write your note here..."
+                  placeholder="Write your email here..."
                 />
               </label>
             </Flex>
