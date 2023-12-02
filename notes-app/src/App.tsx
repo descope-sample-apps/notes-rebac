@@ -1,10 +1,11 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
-import notesLogo from "/notes.png";
 import { Note } from "./types";
+import NoteCardGrid from "./components/home/note-card-grid";
+import NoteCreation from "./components/home/note-creation";
+import NavBar from "./components/layout/navbar";
 
 import {
-  useDescope,
   useSession,
   useUser,
   getSessionToken,
@@ -13,14 +14,10 @@ import { Descope } from "@descope/react-sdk";
 
 function App() {
   const { isAuthenticated, isSessionLoading } = useSession();
-  const { user, isUserLoading } = useUser();
-  const { logout } = useDescope();
+  const { isUserLoading } = useUser();
   const [notes, setNotes] = useState<Note[]>([]);
 
-  useEffect(() => {
-    if (!isAuthenticated) return;
-
-    const fetchNotes = async () => {
+  const fetchNotes = async () => {
       try {
         const sessionToken = getSessionToken();
         const response = await fetch("http://localhost:3000/api/notes", {
@@ -36,54 +33,41 @@ function App() {
       }
     };
 
-    fetchNotes();
-  }, [isAuthenticated]);
+    useEffect(() => {
+      if (isAuthenticated) {
+        fetchNotes();
+      }
+    }, [isAuthenticated]);
 
-  const handleLogout = useCallback(() => {
-    logout();
-  }, [logout]);
+  
+  if (isSessionLoading || isUserLoading) {
+    return <p>Loading...</p>;
+  }
+
+  if (!isAuthenticated) {
+    return  <div className="max-w-xs rounded-md overflow-hidden m-auto border border-gray-200">
+      <Descope
+        flowId="sign-up-or-in"
+        // theme="light"
+        onError={(e) => console.log("Could not log in!" + e)}
+      />
+    </div>;
+  }
 
   return (
-    <>
-      {!isAuthenticated && (
-        <Descope
-          flowId="sign-up-or-in"
-          theme="dark"
-          onSuccess={() => {
-            console.log("Logged in!");
-          }}
-          onError={(e) => console.log("Could not log in!" + e)}
-        />
-      )}
+    <div className="text-left">
+       <NavBar/>
 
-      {(isSessionLoading || isUserLoading) && <p>Loading...</p>}
+       <NoteCreation
+        setNotes={setNotes}
+        notes={notes}
+       />
 
-      {!isUserLoading && isAuthenticated && (
-        <>
-          <div className="app-container">
-            <div className="menu">
-              <img src={notesLogo} className="logo" alt="Notes logo" />
-            </div>
-            <div className="notes-grid">
-              {notes.map((note) => (
-                <div className="note-item">
-                  <div className="notes-header">
-                    <button>x</button>
-                  </div>
-                  <h2>{note.title}</h2>
-                  <p>{note.content}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="user">
-            <span>
-              {user.name} <button onClick={handleLogout}>Logout</button>
-            </span>
-          </div>
-        </>
-      )}
-    </>
+       <NoteCardGrid 
+        setNotes={setNotes}
+        notes={notes}
+       />
+    </div>
   );
 }
 
