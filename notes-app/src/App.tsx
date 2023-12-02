@@ -17,21 +17,27 @@ function App() {
   const { logout } = useDescope();
   const [notes, setNotes] = useState<Note[]>([]);
 
-  const fetchNotes = async () => {
-    try {
-      const sessionToken = getSessionToken();
-      const response = await fetch("http://localhost:3000/api/notes", {
-        headers: {
-          Accept: "application/json",
-          Authorization: "Bearer " + sessionToken,
-        },
-      });
-      const notes: Note[] = await response.json();
-      setNotes(notes);
-    } catch (e) {
-      console.log(e);
-    }
-  };
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const fetchNotes = async () => {
+      try {
+        const sessionToken = getSessionToken();
+        const response = await fetch("http://localhost:3000/api/notes", {
+          headers: {
+            Accept: "application/json",
+            Authorization: "Bearer " + sessionToken,
+          },
+        });
+        const notes: Note[] = await response.json();
+        setNotes(notes);
+      } catch (e) {
+        console.log(e);
+      }
+    };
+
+    fetchNotes();
+  }, [isAuthenticated]);
 
   const handleLogout = useCallback(() => {
     logout();
@@ -43,7 +49,9 @@ function App() {
         <Descope
           flowId="sign-up-or-in"
           theme="dark"
-          onSuccess={() => fetchNotes()}
+          onSuccess={() => {
+            console.log("Logged in!");
+          }}
           onError={(e) => console.log("Could not log in!" + e)}
         />
       )}
