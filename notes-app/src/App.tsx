@@ -27,9 +27,7 @@ function App() {
           },
         });
         const notes: Note[] = await response.json();
-        console.log(notes)
         setNotes(notes);
-        console.log(notes)
       } catch (e) {
         console.log(e);
       }
