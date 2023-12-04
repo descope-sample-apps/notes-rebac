@@ -49,7 +49,6 @@ function App() {
     return  <div className="max-w-xs rounded-md overflow-hidden m-auto border border-gray-200">
       <Descope
         flowId="sign-up-or-in"
-        // theme="light"
         onError={(e) => console.log("Could not log in!" + e)}
       />
     </div>;
@@ -59,11 +58,13 @@ function App() {
     <div className="text-left">
        <NavBar/>
 
-       <NoteCreation
-        setNotes={setNotes}
-        notes={notes}
-       />
-       <ManageGroups/>
+       <div className="flex flex-row w-full justify-between">
+        <NoteCreation
+          setNotes={setNotes}
+          notes={notes}
+        />
+        <ManageGroups/>
+       </div>
 
        <NoteCardGrid 
         setNotes={setNotes}

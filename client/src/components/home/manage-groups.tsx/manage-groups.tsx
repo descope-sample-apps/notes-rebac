@@ -3,6 +3,7 @@ import CreateGroup from "./create-group";
 import { useEffect, useState } from "react";
 import { Group } from "../../../types";
 import { getSessionToken, useSession } from "@descope/react-sdk";
+import GroupItem from "./group-item";
 
 
 export default function ManageGroups() {
@@ -20,7 +21,6 @@ export default function ManageGroups() {
           },
         });
         const groups: Group[] = await response.json();
-        console.log(groups)
         setGroups(groups);
       } catch (e) {
         console.log(e);
@@ -37,7 +37,7 @@ export default function ManageGroups() {
     return <div className="my-4">
       <Dialog.Root>
           <Dialog.Trigger>
-            <button className="bg-black rounded-md text-white px-4 py-1 hover:bg-gray-700 duration-200">Manage Groups</button>
+            <button className="bg-gray-200 rounded-md text-black px-4 py-1 hover:bg-gray-400 duration-200">Manage Groups</button>
           </Dialog.Trigger>
         <Dialog.Content
         style={{ 
@@ -60,11 +60,16 @@ export default function ManageGroups() {
                 groups={groups}
                 setGroups={setGroups}
              />
-             {groups.map((group, i) => (
-              <div key={i}>
-                {group.name}
-              </div>
-             ))}
+             <div>
+              <h2 className="font-bold">Groups</h2>
+              {groups.map((group, i) => {
+
+                return <GroupItem
+                  key={i}
+                  group={group}
+                />
+              })}
+             </div>
             </Flex>
 
             <Flex gap="3" mt="4" justify="end">
