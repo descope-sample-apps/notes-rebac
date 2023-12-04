@@ -16,7 +16,7 @@ import ManageGroups from "./components/home/manage-groups.tsx/manage-groups";
 function App() {
   const { isAuthenticated, isSessionLoading } = useSession();
   const { isUserLoading } = useUser();
-  const [notes, setNotes] = useState<Note[]>([]);
+  const [notes, setNotes] = useState<Note[] | null>(null);
 
   const fetchNotes = async () => {
       try {
@@ -61,11 +61,11 @@ function App() {
 
         (<>
           <div className="flex flex-row w-full justify-between">
-          <NoteCreation
-            setNotes={setNotes}
-            notes={notes}
-          />
-          <ManageGroups/>
+            <NoteCreation
+              setNotes={setNotes}
+              notes={notes}
+            />
+            <ManageGroups/>
           </div>
 
           <NoteCardGrid 

@@ -21,6 +21,7 @@ export default function ManageGroups() {
           },
         });
         const groups: Group[] = await response.json();
+        console.log(groups)
         setGroups(groups);
       } catch (e) {
         console.log(e);

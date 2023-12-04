@@ -4,10 +4,13 @@ import { Note } from "../../types";
 import { Button, Dialog, Flex, Text, TextField } from "@radix-ui/themes";
 
 
-export default function NoteCreation(props: { notes: Note[], setNotes: (notes: Note[]) => void }) {
+export default function NoteCreation(props: { notes: Note[] | null, setNotes: (notes: Note[]) => void }) {
     const { notes, setNotes } = props;
 
     const createNote = async (title: string, content: string) => {
+      if (!notes) {
+        return;
+      }
         try {
           const noteData = { title, content };
           const sessionToken = getSessionToken();

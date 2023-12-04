@@ -4,10 +4,16 @@ import ShareNote from "./share-note";
 import { useState } from "react";
 
 
-export default function NoteCardGrid(props: { notes: Note[], setNotes: (notes: Note[]) => void }) {
+export default function NoteCardGrid(props: { notes: Note[] | null, setNotes: (notes: Note[]) => void }) {
     const { notes, setNotes } = props;
     
+    if (!notes) {
+        return <div className="text-center">...</div>
+    }
     
+    if (notes.length === 0) {
+        return <div className="text-center">No notes</div>
+    }
     return <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {notes.map((note, i) => <NoteItem
             key={i}
