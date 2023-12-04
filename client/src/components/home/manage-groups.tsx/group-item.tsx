@@ -33,7 +33,6 @@ export default function GroupItem(props: { group: Group }) {
                 {/* <h4>Owner - {owner}</h4> */}
                 <div className="flex flex-row">
                     <h3 className="font-bold text-md mr-4">{name}</h3>
-
                     {/* <h4 className="my-auto font-medium text-sm">Members</h4> */}
                     <AddMember
                         group={props.group}
@@ -41,6 +40,8 @@ export default function GroupItem(props: { group: Group }) {
                         setMembers={setMembers}
                     />
                 </div>
+                <p className="text-xs text-gray-600 pb-2 pt-1">{id}</p>
+
                 {members.length === 0 && <div className="text-sm text-gray-500">No members</div>}
                 {members.map((member) => {
                     return <div key={member}>{member}</div>
