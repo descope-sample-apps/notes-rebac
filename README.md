@@ -10,12 +10,12 @@ This app uses Descope authentication and FGA (fine-grain authorization - ReBAC) 
 - Clone the repo
 
 #### Server
-1. navigate to the server folder
+1. Navigate to the server folder
 ```
 cd server
 ```
 2. Set the following `.env` file in the server directory
-Our backend runs on Postgres, and we recommend connecting with a serverless option like [Neon](https://neon.tech/). You can get the Descope [Project ID](https://app.descope.com/settings/project) and [Management Key](https://app.descope.com/settings/company/managementkeys) from your Descope Dashboard. 
+Our backend runs on Postgres, and we recommend connecting with a managed service like [Neon](https://neon.tech/). You can get the Descope [Project ID](https://app.descope.com/settings/project) and [Management Key](https://app.descope.com/settings/company/managementkeys) from your Descope Dashboard. 
 ```
 PGHOST=<DB-Host> # e.g 'ep-happy-flower-125243-pooler.us-west-2.aws.neon.tech'
 PGDATABASE=<DB-name> # e.g 'neondb'
@@ -37,6 +37,7 @@ npm start
 cd client
 ```
 2. Set the following `.env` file in the client directory
+Use the same Project ID as used in the server.
 ```
 VITE_DESCOPE_PROJECT_ID=<Your-Project-ID>
 ```
