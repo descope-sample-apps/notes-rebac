@@ -42,10 +42,10 @@ export default function AddMember(props: { group: Group, members: string[], setM
       await addMember(email);
     };
     
-    return <div className="my-4">
+    return <div>
     <Dialog.Root>
         <Dialog.Trigger>
-          <button className="bg-black rounded-md text-white px-4 py-1 hover:bg-gray-700 duration-200">Add Member</button>
+          <button className="bg-gray-200 rounded-md text-black px-4 py-1 hover:bg-gray-500 duration-200">Add Member</button>
         </Dialog.Trigger>
      
 

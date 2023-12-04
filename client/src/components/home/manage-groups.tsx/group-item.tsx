@@ -30,17 +30,17 @@ export default function GroupItem(props: { group: Group }) {
         fetchMembers();
     }, [id]);
     return <div className="my-4" key={id}>
-                <h3>{name}</h3>
+                <h3 className="font-bold text-xl">{name}</h3>
                 <h4>Owner - {owner}</h4>
-                
-
-                <h4>Members</h4>
-                <AddMember
-                    group={props.group}
-                    members={members}
-                    setMembers={setMembers}
-                />
-                
+                <div className="flex flex-row w-full justify-between">
+                    <h4 className="my-auto font-medium text-lg">Members</h4>
+                    <AddMember
+                        group={props.group}
+                        members={members}
+                        setMembers={setMembers}
+                    />
+                </div>
+                {members.length === 0 && <div>No members</div>}
                 {members.map((member) => {
                     return <div key={member}>{member}</div>
                 })}
