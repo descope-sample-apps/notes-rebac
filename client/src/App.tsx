@@ -11,6 +11,7 @@ import {
   getSessionToken,
 } from "@descope/react-sdk";
 import { Descope } from "@descope/react-sdk";
+import ManageGroups from "./components/home/manage-groups.tsx/manage-groups";
 
 function App() {
   const { isAuthenticated, isSessionLoading } = useSession();
@@ -62,6 +63,7 @@ function App() {
         setNotes={setNotes}
         notes={notes}
        />
+       <ManageGroups/>
 
        <NoteCardGrid 
         setNotes={setNotes}

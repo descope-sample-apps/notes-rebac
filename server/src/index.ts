@@ -180,11 +180,13 @@ app.get("/api/notes", async (req, res) => {
 // Create a new note by posting to the API
 app.post("/api/notes", async (req, res) => {
   const { title, content } = req.body;
+
   if (!title || !content) {
     return res.status(400).json({ error: "title and content fields required" });
   }
   try {
     const note = await db.insertNote(title, content);
+    console.log(note)
     // Make sure to create the note owner permission in Descope ReBAC
     await descopeClient.management.authz.createRelations([
       {

@@ -7,7 +7,7 @@
  */
 export type Note = {
   id: string;
-  version: Number;
+  version: number;
   createDate?: Date;
   modifyDate?: Date;
   title: string;
@@ -20,7 +20,7 @@ export type Note = {
  */
 export type Group = {
   id: string;
-  version: Number;
+  version: number;
   createDate?: Date;
   modifyDate?: Date;
   owner: string;
