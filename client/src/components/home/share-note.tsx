@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import { getSessionToken } from "@descope/react-sdk";
 import { Note } from "../../types";
-import { Button, Dialog, Flex, Text, TextField } from "@radix-ui/themes";
+import { Button, Dialog, Flex, RadioGroup, Text, TextField } from "@radix-ui/themes";
+
 
 export default function ShareNote(props: { note: Note }) {
     const { note } = props;
 
-    const shareNote = async (role: string, email?: string, group?: string) => {
+    const shareNote = async (role: string, shareToType: string,  email?: string, group?: string) => {
       try {
-        const noteData = { email, group, role };
+        const noteData = shareToType === 'user' ? { role, email } : { role, group };
+        console.log(noteData)
         const sessionToken = getSessionToken();
         const response = await fetch(`http://localhost:3000/api/notes/${note.id}/share`, {
           method: "POST",
@@ -19,8 +21,9 @@ export default function ShareNote(props: { note: Note }) {
           },
           body: JSON.stringify(noteData),
         });
-        const data = await response.json();
-        console.log(data);
+        if (!response.ok) {
+          console.log(response)
+        }
       } catch (e) {
         console.log(e);
       }
@@ -28,7 +31,6 @@ export default function ShareNote(props: { note: Note }) {
     
     const [email, setEmail] = useState<undefined | string>(undefined);
     const [groupId, setGroupId] = useState<undefined | string>(undefined);
-    const [role, setRole] = useState('');
 
     const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       setEmail(event.target.value);
@@ -38,20 +40,29 @@ export default function ShareNote(props: { note: Note }) {
       setGroupId(event.target.value);
     };
 
-    const handleRoleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      setRole(event.target.value);
+
+    const [roleRadio, setRoleRadio] = useState('viewer');
+
+    const onRoleRadioValueChange = (value: string) => {
+      setRoleRadio(value);
     };
+
+    const [shareTo, setShareTo] = useState('user');
+
+    const onShareToRadioValueChange = (value: string) => {
+      setShareTo(value);
+    }
+
   
     const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault(); 
-
-      if (!role) {
+      if (!roleRadio) {
         return;
       }
       if (email && groupId) {
         return;
       }
-      await shareNote(role, email, groupId);
+      await shareNote(roleRadio, shareTo, email, groupId);
     };
     
     return <div>
@@ -72,31 +83,61 @@ export default function ShareNote(props: { note: Note }) {
             <Flex direction="column" gap="3">
               <label>
                 <Text as="div" size="2" mb="1" weight="bold">
-                  Role*
+                  Role*  (The creator of a note is the sole `owner`)
                 </Text>
-                <TextField.Input
-                  onChange={handleRoleChange}
-                  placeholder="Enter role"
-                />
+                <RadioGroup.Root value={roleRadio} onValueChange={onRoleRadioValueChange}>
+                  <Flex gap="2" direction="column">
+                    <Text as="label" size="2">
+                      <Flex gap="2">
+                        <RadioGroup.Item value="viewer" /> Viewer
+                      </Flex>
+                    </Text>
+                    <Text as="label" size="2">
+                      <Flex gap="2">
+                        <RadioGroup.Item value="editor" /> Editor
+                      </Flex>
+                    </Text>
+                  </Flex>
+                </RadioGroup.Root>
               </label>
-              <label>
                 <Text as="div" size="2" mb="1" weight="bold">
-                  Group ID
+                  Share to:
                 </Text>
-                <TextField.Input
-                  onChange={handleGroupIdChange}
-                  placeholder="Enter the Group ID here..."
-                />
-              </label>
-              <label>
-                <Text as="div" size="2" mb="1" weight="bold">
-                  Email
-                </Text>
-                <TextField.Input
-                  onChange={handleEmailChange}
-                  placeholder="Write your email here..."
-                />
-              </label>
+                <RadioGroup.Root value={shareTo} onValueChange={onShareToRadioValueChange}>
+                  <Flex gap="2" direction="column">
+                    <Text as="label" size="2">
+                      <Flex gap="2">
+                        <RadioGroup.Item value="group" /> Group
+                      </Flex>
+                    </Text>
+                    <Text as="label" size="2">
+                      <Flex gap="2">
+                        <RadioGroup.Item value="user" /> User
+                      </Flex>
+                    </Text>
+                  </Flex>
+                </RadioGroup.Root>
+              {shareTo === 'group' ? (
+                <label>
+                  {/* <Text as="div" size="2" mb="1" weight="bold">
+                    Group ID
+                  </Text> */}
+                  <TextField.Input
+                    onChange={handleGroupIdChange}
+                    placeholder="Enter the Group ID here..."
+                  />
+                </label>
+              ) : (
+                <label>
+                  {/* <Text as="div" size="2" mb="1" weight="bold">
+                    Email
+                  </Text> */}
+                  <TextField.Input
+                    onChange={handleEmailChange}
+                    placeholder="Enter email here..."
+                  />
+                </label>
+              )}
             </Flex>
 
             <Flex gap="3" mt="4" justify="end">

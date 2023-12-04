@@ -42,34 +42,38 @@ function App() {
 
   
   if (isSessionLoading || isUserLoading) {
-    return <p>Loading...</p>;
+    return null;
   }
 
-  if (!isAuthenticated) {
-    return  <div className="max-w-xs rounded-md overflow-hidden m-auto border border-gray-200">
-      <Descope
-        flowId="sign-up-or-in"
-        onError={(e) => console.log("Could not log in!" + e)}
-      />
-    </div>;
-  }
 
   return (
-    <div className="text-left">
+    <div className="text-left w-full">
        <NavBar/>
 
-       <div className="flex flex-row w-full justify-between">
-        <NoteCreation
+        {!isAuthenticated ? 
+
+        (<div className="max-w-xs rounded-md overflow-hidden m-auto shadow-lg mt-20">
+          <Descope
+            flowId="sign-up-or-in"
+            onError={(e) => console.log("Could not log in!" + e)}
+          />
+        </div>) : 
+
+        (<>
+          <div className="flex flex-row w-full justify-between">
+          <NoteCreation
+            setNotes={setNotes}
+            notes={notes}
+          />
+          <ManageGroups/>
+          </div>
+
+          <NoteCardGrid 
           setNotes={setNotes}
           notes={notes}
-        />
-        <ManageGroups/>
-       </div>
-
-       <NoteCardGrid 
-        setNotes={setNotes}
-        notes={notes}
-       />
+          />
+        </>)}
+       
     </div>
   );
 }
