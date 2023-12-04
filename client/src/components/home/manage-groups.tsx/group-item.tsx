@@ -41,7 +41,7 @@ export default function GroupItem(props: { group: Group }) {
                         setMembers={setMembers}
                     />
                 </div>
-                {members.length === 0 && <div className="text-sm">No members</div>}
+                {members.length === 0 && <div className="text-sm text-gray-500">No members</div>}
                 {members.map((member) => {
                     return <div key={member}>{member}</div>
                 })}

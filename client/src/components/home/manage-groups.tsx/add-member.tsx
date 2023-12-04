@@ -46,7 +46,7 @@ export default function AddMember(props: { group: Group, members: string[], setM
     return <div>
     <Dialog.Root>
         <Dialog.Trigger>
-          <button className="bg-gray-200 rounded-md text-black px-4 py-1 hover:bg-gray-500 duration-200">Add Member</button>
+          <button className="bg-gray-200 rounded-md text-black text-sm px-2 py-0 hover:bg-gray-500 duration-200">Add Member</button>
         </Dialog.Trigger>
      
 
