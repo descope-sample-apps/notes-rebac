@@ -78,14 +78,14 @@ export default function ShareNote(props: { note: Note }) {
         <Dialog.Content style={{ maxWidth: 450 }}>
           <Dialog.Title>Share Note</Dialog.Title>
           <Dialog.Description size="2" mb="4">
-            Shares the note with a user or group. Please enter either the Group ID or email, but not both.
+            Shares the note with a user or group. The creator of the note is the sole 'owner.'
           </Dialog.Description>
           <form onSubmit={onSubmit}>
 
             <Flex direction="column" gap="3">
               <label>
                 <Text as="div" size="2" mb="1" weight="bold">
-                  Role*  (The creator of a note is the sole `owner`)
+                  Role
                 </Text>
                 <RadioGroup.Root value={roleRadio} onValueChange={onRoleRadioValueChange}>
                   <Flex gap="2" direction="column">
@@ -102,8 +102,9 @@ export default function ShareNote(props: { note: Note }) {
                   </Flex>
                 </RadioGroup.Root>
               </label>
-                <Text as="div" size="2" mb="1" weight="bold">
-                  Share to:
+               <label>
+               <Text as="div" size="2" mb="1" weight="bold">
+                  Share
                 </Text>
                 <RadioGroup.Root value={shareTo} onValueChange={onShareToRadioValueChange}>
                   <Flex gap="2" direction="column">
@@ -119,6 +120,7 @@ export default function ShareNote(props: { note: Note }) {
                     </Text>
                   </Flex>
                 </RadioGroup.Root>
+                <div className="mb-2"></div>
               {shareTo === 'group' ? (
                 <label>
                   {/* <Text as="div" size="2" mb="1" weight="bold">
@@ -140,6 +142,7 @@ export default function ShareNote(props: { note: Note }) {
                   />
                 </label>
               )}
+               </label>
             </Flex>
 
             <Flex gap="3" mt="4" justify="end">
