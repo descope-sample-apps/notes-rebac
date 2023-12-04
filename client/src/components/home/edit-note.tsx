@@ -11,8 +11,9 @@ export default function EditNote(props: { note: Note, notes: Note[] | null, setN
       if (!notes) {
         return;
       }
+      console.log(note)
         try {
-          const version = note.version + 1;
+          const version = note.version;
           const noteData = { title, content, version };
           const sessionToken = getSessionToken();
           const response = await fetch("http://localhost:3000/api/notes/" + note.id, {
@@ -25,9 +26,7 @@ export default function EditNote(props: { note: Note, notes: Note[] | null, setN
             body: JSON.stringify(noteData),
           });
           if (!response.ok) {
-            if (response.status === 403) {
-              alert("Error: " + (await response.json()).error)
-            }
+            alert("Error: " + (await response.json()).error)
           } else {
             const newNote: Note = await response.json();
             // Update the note in the notes array
