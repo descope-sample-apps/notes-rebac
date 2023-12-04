@@ -17,7 +17,7 @@ cd server
 2. Set the following `.env` file in the server directory
 Our backend runs on Postgres, and we recommend connecting with a serverless option like [Neon](https://neon.tech/). You can get the Descope [Project ID](https://app.descope.com/settings/project) and [Management Key](https://app.descope.com/settings/company/managementkeys) from your Descope Dashboard. 
 ```
-PGHOST=<DB-Host> # e.g 'ep-proud-wildflower-78847619-pooler.us-west-2.aws.neon.tech'
+PGHOST=<DB-Host> # e.g 'ep-happy-flower-125243-pooler.us-west-2.aws.neon.tech'
 PGDATABASE=<DB-name> # e.g 'neondb'
 PGUSER=<DB-User> # e.g 'sarah'
 PGPASSWORD=<DB-Password> # 'password'
