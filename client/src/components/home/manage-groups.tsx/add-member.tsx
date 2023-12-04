@@ -6,7 +6,6 @@ import { Button, Dialog, Flex, Text, TextField } from "@radix-ui/themes";
 export default function AddMember(props: { group: Group, members: string[], setMembers: (members: string[]) => void }) {
     const { id } = props.group;
     const addMember = async (email: string) => {
-      console.log("Add member")
         try {
           const sessionToken = getSessionToken();
           const res = await fetch(`http://localhost:3000/api/groups/${id}/add`, {
@@ -20,6 +19,8 @@ export default function AddMember(props: { group: Group, members: string[], setM
           });
           if (res.ok) {
             props.setMembers([...props.members, email]);
+          } else {
+            console.log(res);
           }
         } catch (e) {
           console.log(e);

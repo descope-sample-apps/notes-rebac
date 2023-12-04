@@ -23,6 +23,8 @@ export default function ShareNote(props: { note: Note }) {
         });
         if (!response.ok) {
           console.log(response)
+        } else {
+          alert("Note shared successfully!")
         }
       } catch (e) {
         console.log(e);
