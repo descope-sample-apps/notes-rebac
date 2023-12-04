@@ -5,11 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "fe": "cd notes-app && npm run dev",
-    "be": "cd notes-app-server && npm start",
+    "fe": "cd client && npm run dev",
+    "be": "cd server && npm start",
     "dev": "concurrently \"npm run fe\" \"npm run be\"",
     "prepare": "husky install",
-    "postinstall": "concurrently \"cd notes-app && npm i\" \"cd notes-app-server && npm i\""
+    "postinstall": "concurrently \"cd client && npm i\" \"cd server && npm i\""
   },
   "repository": {
     "type": "git",

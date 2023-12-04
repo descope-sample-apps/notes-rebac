@@ -9,12 +9,16 @@ import crypto from "crypto";
  * Our connection pool to the database.
  * We expect env variables or .env file
  */
+let { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
 const pool = new Pool({
-  host: process.env.DATABASE_HOST,
-  port: parseInt(process.env.DATABASE_PORT || "5432"),
-  user: process.env.DATABASE_USER,
-  password: process.env.DATABASE_PASSWORD,
-  database: process.env.DATABASE_DB,
+  host: PGHOST,
+  port: parseInt(process.env.PGPORT || "5432"),
+  user: PGUSER,
+  password: PGPASSWORD,
+  database: PGDATABASE,
+  ssl: {
+      rejectUnauthorized: true,
+  }
 });
 
 /**

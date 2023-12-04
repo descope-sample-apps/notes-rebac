@@ -1,19 +1,14 @@
 "use client";
 
-import { useDescope, useSession, useUser } from "@descope/react-sdk";
+import { useSession, useUser } from "@descope/react-sdk";
 import notesLogo from "../../../public/notes.png";
-import { useCallback } from "react";
-import { Button } from "@radix-ui/themes";
+import UserDropdown from "../shared/user-dropdown";
 
 export default function NavBar() {
 
   const { isSessionLoading, isAuthenticated } = useSession();
-  const { isUserLoading } = useUser();
-  const { logout } = useDescope();
+  const { isUserLoading, user } = useUser();
 
-  const handleLogout = useCallback(() => {
-    logout();
-  }, [logout]);
 
   if (isSessionLoading || isUserLoading) {
     return <p>...</p>;
@@ -27,12 +22,16 @@ export default function NavBar() {
           <a href="/" 
           className="flex items-center flex flex-row font-display text-2xl"
           >
-              <img className="inline-block" src={notesLogo} width={50}  alt="Notes logo" />
+              <img className="inline-block" src={notesLogo} width={40}  alt="Notes logo" /> 
+              <h1 className="px-4 text-md font-black">Descope FGA Notes App</h1>
           </a>
           <div>
             {isAuthenticated ? (
             <div>
-              <Button variant="soft" onClick={handleLogout}>Logout</Button>
+              <UserDropdown
+                name={user?.name || ""}
+                email={user?.email || ""}
+              />
             </div>
             ) : (
               <></>

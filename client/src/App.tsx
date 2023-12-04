@@ -11,11 +11,12 @@ import {
   getSessionToken,
 } from "@descope/react-sdk";
 import { Descope } from "@descope/react-sdk";
+import ManageGroups from "./components/home/manage-groups.tsx/manage-groups";
 
 function App() {
   const { isAuthenticated, isSessionLoading } = useSession();
   const { isUserLoading } = useUser();
-  const [notes, setNotes] = useState<Note[]>([]);
+  const [notes, setNotes] = useState<Note[] | null>(null);
 
   const fetchNotes = async () => {
       try {
@@ -41,32 +42,38 @@ function App() {
 
   
   if (isSessionLoading || isUserLoading) {
-    return <p>Loading...</p>;
+    return null;
   }
 
-  if (!isAuthenticated) {
-    return  <div className="max-w-xs rounded-md overflow-hidden m-auto border border-gray-200">
-      <Descope
-        flowId="sign-up-or-in"
-        // theme="light"
-        onError={(e) => console.log("Could not log in!" + e)}
-      />
-    </div>;
-  }
 
   return (
-    <div className="text-left">
+    <div className="text-left w-full">
        <NavBar/>
 
-       <NoteCreation
-        setNotes={setNotes}
-        notes={notes}
-       />
+        {!isAuthenticated ? 
 
-       <NoteCardGrid 
-        setNotes={setNotes}
-        notes={notes}
-       />
+        (<div className="max-w-xs rounded-md overflow-hidden m-auto shadow-lg mt-20">
+          <Descope
+            flowId="sign-up-or-in"
+            onError={(e) => console.log("Could not log in!" + e)}
+          />
+        </div>) : 
+
+        (<>
+          <div className="flex flex-row w-full justify-between">
+            <NoteCreation
+              setNotes={setNotes}
+              notes={notes}
+            />
+            <ManageGroups/>
+          </div>
+
+          <NoteCardGrid 
+          setNotes={setNotes}
+          notes={notes}
+          />
+        </>)}
+       
     </div>
   );
 }
