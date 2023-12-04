@@ -2,6 +2,7 @@ import { getSessionToken } from "@descope/react-sdk";
 import { Note } from "../../types";
 import ShareNote from "./share-note";
 import { useState } from "react";
+import EditNote from "./edit-note";
 
 
 export default function NoteCardGrid(props: { notes: Note[] | null, setNotes: (notes: Note[]) => void }) {
@@ -10,7 +11,7 @@ export default function NoteCardGrid(props: { notes: Note[] | null, setNotes: (n
     if (!notes) {
         return <div className="text-center">...</div>
     }
-    
+
     if (notes.length === 0) {
         return <div className="text-center">No notes</div>
     }
@@ -48,9 +49,14 @@ function NoteItem(props: { note: Note, notes: Note[], setNotes: (notes: Note[]) 
 
     return (<div className="rounded-xl border border-gray-200 bg-white shadow-md h-60 items-center justify-center overflow-scroll">
         
-    <div className="py-4 px-4 flex flex-row">
+    <div className="py-4 px-4 flex flex-row space-x-2">
       {isLoading ? (<>...</>) : (<button className="underline" onClick={() => deleteNote(note.id)}>Delete</button>)}
-      &nbsp;<ShareNote note={note} />
+      <ShareNote note={note} />
+      <EditNote
+            notes={notes}
+            setNotes={setNotes}
+            note={note}
+      />
     </div>
 
     <div className="pb-6 px-4 text-left">

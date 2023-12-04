@@ -43,28 +43,31 @@ export default function ManageGroups() {
         <Dialog.Content
         style={{ 
             position: 'absolute',
-            top: 0,
+            // top: 0,
             right: 0,
-            bottom: 0,
+            // bottom: 0,
             left: 0,
             maxWidth: "800px",
             margin: "auto",
             overflowY: 'auto'
             }}>
-          <Dialog.Title>Manage Groups</Dialog.Title>
+          <div className="flex flew-row w-full justify-between">
+            <Dialog.Title>Manage Groups</Dialog.Title>
+            <CreateGroup
+                  groups={groups}
+                  setGroups={setGroups}
+              />
+          </div>
           <Dialog.Description size="2" mb="4">
-            Create or delete groups. Add or remove members from groups.
+            Create or delete groups that you created. Add or remove members from groups.
           </Dialog.Description>
 
             <Flex direction="column" gap="3">
-             <CreateGroup
-                groups={groups}
-                setGroups={setGroups}
-             />
+            
              <div>
-              <h2 className="font-bold">Groups</h2>
+              {/* <h2 className="font-bold">Your Groups</h2> */}
+              {groups.length === 0 && <div>No groups</div>}
               {groups.map((group, i) => {
-
                 return <GroupItem
                   key={i}
                   group={group}

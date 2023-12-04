@@ -43,7 +43,7 @@ export default function CreateGroup(props: { groups: Group[], setGroups: (groups
         await createGroup(name);
       };
     
-    return <div className="my-4">
+    return <div>
       <Dialog.Root>
           <Dialog.Trigger>
             <button className="bg-black rounded-md text-white px-4 py-1 hover:bg-gray-700 duration-200">Create Group</button>
