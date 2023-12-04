@@ -10,7 +10,6 @@ export default function ShareNote(props: { note: Note }) {
     const shareNote = async (role: string, shareToType: string,  email?: string, group?: string) => {
       try {
         const noteData = shareToType === 'user' ? { role, email } : { role, group };
-        console.log(noteData)
         const sessionToken = getSessionToken();
         const response = await fetch(`http://localhost:3000/api/notes/${note.id}/share`, {
           method: "POST",

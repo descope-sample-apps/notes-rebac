@@ -11,7 +11,6 @@ export default function EditNote(props: { note: Note, notes: Note[] | null, setN
       if (!notes) {
         return;
       }
-      console.log(note)
         try {
           const version = note.version;
           const noteData = { title, content, version };

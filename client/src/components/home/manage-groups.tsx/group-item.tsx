@@ -18,7 +18,6 @@ export default function GroupItem(props: { group: Group }) {
             },
           });
           const members: string[] = await response.json();
-          console.log(members)
           setMembers(members);
         } catch (e) {
           console.log(e);
