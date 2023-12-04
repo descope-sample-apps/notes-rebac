@@ -8,20 +8,43 @@ This app uses Descope authentication and FGA (fine-grain authorization - ReBAC) 
 ### Run locally
 
 - Clone the repo
-- Set the following `.env` file in the root directory
 
+#### Server
+- navigate to the server folder
 ```
-DATABASE_HOST=<DB-Host> # e.g localhost
-DATABASE_PORT=<DB-Port> # e.g 5432
-DATABASE_DB=<DB-Name> # e.g postgres
-DATABASE_USER=<-DB-User> # e.g postgres
-DATABASE_PASSWORD=<DB-Password> # e.g passwordless
+cd server
+```
+- Set the following `.env` file in the server directory
+Our backend runs on Postgres, and we recommend connecting with a serverless option like [Neon](https://neon.tech/). You can get the Descope [Project ID](https://app.descope.com/settings/project) and [Management Key](https://app.descope.com/settings/company/managementkeys) from your Descope Dashboard. 
+```
+PGHOST=<DB-Host> # e.g 'ep-proud-wildflower-78847619-pooler.us-west-2.aws.neon.tech'
+PGDATABASE=<DB-name> # e.g 'neondb'
+PGUSER=<DB-User> # e.g 'sarah'
+PGPASSWORD=<DB-Password> # 'password'
 
 DESCOPE_PROJECT_ID=<Your-Project-ID>
 DESCOPE_MANAGEMENT_KEY=<Your-Management-Key>
 ```
+- Run the server
+```
+npm install
+npm start
+```
 
-- Run `npm install` in the root directory (it will also install the frontend and backend dependencies)
-- Run `npm run dev` in the root directory
+#### Client
+- Navigate to the client folder
+```
+cd client
+```
+- Set the following `.env` file in the client directory
+```
+VITE_DESCOPE_PROJECT_ID=<Your-Project-ID>
+```
+- Run the client
+```
+npm install
+npm run dev
+```
+
 
 You client should be running on `http://localhost:5173` and the server on `http://localhost:3000`
