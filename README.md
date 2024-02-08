@@ -52,7 +52,13 @@ cd client
 VITE_DESCOPE_PROJECT_ID=<Your-Project-ID>
 ```
 
-3. Run the client
+3. Add `email` to JWT in Descope flow
+
+Navigate to your Descope console, select the flow you'd like to run (the default is `sign-up-or-in`) and add this field to the JWT. This way, the middleware in the backend will be able to access the email directly from the jwt.
+<img width="1317" alt="Screenshot 2024-02-08 at 2 08 51 PM" src="https://github.com/descope-sample-apps/notes-rebac/assets/46854522/13bae15e-d50e-4244-b1df-b7a3bf7209f8">
+
+
+5. Run the client
 
 ```
 npm install
