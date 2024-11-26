@@ -25,82 +25,23 @@ const init = async () => {
   const authzSchema = await descopeClient.management.authz.loadSchema();
   if (authzSchema.data?.name !== "1.0") {
     console.log("Creating the ReBAC schema...");
-    await descopeClient.management.authz.saveSchema(
-      {
-        name: "1.0",
-        namespaces: [
-          // the namespaces (entities) in our schema
-          {
-            name: "group", // group is used to track group membership and ownership
-            relationDefinitions: [
-              {
-                name: "member",
-              },
-              {
-                name: "owner",
-              },
-            ],
-          },
-          {
-            name: "note", // note used to track note permissions (owner, editor and viewer)
-            relationDefinitions: [
-              {
-                name: "owner", // the one and only owner of the note
-              },
-              {
-                // Anyone who has access to edit a note
-                // Access can be granted directly but of course, owner is also editor
-                name: "editor",
-                complexDefinition: {
-                  nType: "union",
-                  children: [
-                    {
-                      nType: "child",
-                      expression: {
-                        neType: "self",
-                      },
-                    },
-                    {
-                      nType: "child",
-                      expression: {
-                        neType: "targetSet",
-                        targetRelationDefinition: "owner",
-                        targetRelationDefinitionNamespace: "note",
-                      },
-                    },
-                  ],
-                },
-              },
-              {
-                // Anyone who has access to view a note
-                // Access can be granted directly but of course, editor is also viewer
-                name: "viewer",
-                complexDefinition: {
-                  nType: "union",
-                  children: [
-                    {
-                      nType: "child",
-                      expression: {
-                        neType: "self",
-                      },
-                    },
-                    {
-                      nType: "child",
-                      expression: {
-                        neType: "targetSet",
-                        targetRelationDefinition: "editor",
-                        targetRelationDefinitionNamespace: "note",
-                      },
-                    },
-                  ],
-                },
-              },
-            ],
-          },
-        ],
-      },
-      true,
-    );
+    // await descopeClient.management.fga.saveSchema(`
+    //   model AuthZ 1.0
+    //   type user
+
+    //   type group
+    //     relation member: user
+    //     relation owner: user
+
+    //   type note
+    //     relation owner: user | group#member | group#owner | group
+    //     relation editor: group | group#member | group#owner | user
+    //     relation viewer: group | group#member | group#owner | user
+
+    //     permission can_edit: editor | owner
+    //     permission can_view: viewer | can_edit
+    // `)
+
     console.log("ReBAC schema created.");
   }
 };
@@ -158,17 +99,19 @@ app.use(authMiddleware);
 
 // Handle retrieving of the notes
 app.get("/api/notes", async (req, res) => {
+
+  const authzSchema = await descopeClient.management.authz.loadSchema();
   // First, make sure to identify all the notes we have access to (viewer permission)
   // This is done for us by Descope ReBAC
   const allRelations = await descopeClient.management.authz.whatCanTargetAccess(
     req.email!,
   );
-  // Filter only note viewer relations (permissions)
+  // Filter only notes with can_view permissions
   const ids = allRelations.data
     ?.filter(
       (relation) =>
         relation.namespace === "note" &&
-        relation.relationDefinition === "viewer",
+        relation.relationDefinition === "can_view"
     )
     .map((relation) => relation.resource);
   // Now we can load the notes from the database
@@ -186,7 +129,6 @@ app.post("/api/notes", async (req, res) => {
   }
   try {
     const note = await db.insertNote(title, content);
-    console.log(note)
     // Make sure to create the note owner permission in Descope ReBAC
     await descopeClient.management.authz.createRelations([
       {
@@ -213,11 +155,12 @@ app.put("/api/notes/:id", async (req, res) => {
   }
 
   try {
-    // First, check if user is an editor of the note
+    // First, check if user has can_edit permission on the note
+    // Meaning they are either an editor or owner
     const authorized = await descopeClient.management.authz.hasRelations([
       {
         resource: req.params.id,
-        relationDefinition: "editor",
+        relationDefinition: "can_edit",
         namespace: "note",
         target: req.email!,
       },
