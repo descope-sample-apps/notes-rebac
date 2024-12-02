@@ -29,21 +29,21 @@ const init = async () => {
 
     const schema = {
       dsl: `
-      model AuthZ 1.0
-      type user
+        model AuthZ 1.0
+        type user
 
-      type group
-        relation member: user
-        relation owner: user
+        type group
+          relation member: user
+          relation owner: user
 
-      type note
-        relation owner: user | group#member | group#owner | group
-        relation editor: group | group#member | group#owner | user
-        relation viewer: group | group#member | group#owner | user
+        type note
+          relation owner: user | group#member | group#owner | group
+          relation editor: group | group#member | group#owner | user
+          relation viewer: group | group#member | group#owner | user
 
-        permission can_edit: editor | owner
-        permission can_view: viewer | can_edit
-    `
+          permission can_edit: editor | owner
+          permission can_view: viewer | can_edit
+      `
     }
     await descope.management.fga.saveSchema(schema)
 
