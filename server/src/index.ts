@@ -11,7 +11,7 @@ const DESCOPE_PROJECT_ID = process.env.DESCOPE_PROJECT_ID as string;
 const DESCOPE_MANAGEMENT_KEY = process.env.DESCOPE_MANAGEMENT_KEY as string;
 
 // The Descope client used throughout the code
-const descopeClient = DescopeClient({
+const descope = DescopeClient({
   projectId: DESCOPE_PROJECT_ID,
   managementKey: DESCOPE_MANAGEMENT_KEY,
 });
@@ -22,25 +22,30 @@ const descopeClient = DescopeClient({
 const init = async () => {
   await db.initSchema();
   // Load the existing schema and only update if version is different from what we expect
-  const authzSchema = await descopeClient.management.authz.loadSchema();
+  const authzSchema = await descope.management.authz.loadSchema();
   if (authzSchema.data?.name !== "1.0") {
+
     console.log("Creating the ReBAC schema...");
-    // await descopeClient.management.fga.saveSchema(`
-    //   model AuthZ 1.0
-    //   type user
 
-    //   type group
-    //     relation member: user
-    //     relation owner: user
+    const schema = {
+      dsl: `
+      model AuthZ 1.0
+      type user
 
-    //   type note
-    //     relation owner: user | group#member | group#owner | group
-    //     relation editor: group | group#member | group#owner | user
-    //     relation viewer: group | group#member | group#owner | user
+      type group
+        relation member: user
+        relation owner: user
 
-    //     permission can_edit: editor | owner
-    //     permission can_view: viewer | can_edit
-    // `)
+      type note
+        relation owner: user | group#member | group#owner | group
+        relation editor: group | group#member | group#owner | user
+        relation viewer: group | group#member | group#owner | user
+
+        permission can_edit: editor | owner
+        permission can_view: viewer | can_edit
+    `
+    }
+    await descope.management.fga.saveSchema(schema)
 
     console.log("ReBAC schema created.");
   }
@@ -77,7 +82,7 @@ const authMiddleware = async (
     if (bearer.length !== 2) {
       throw new Error("Invalid authorization header");
     }
-    req.authInfo = await descopeClient.validateSession(bearer[1]);
+    req.authInfo = await descope.validateSession(bearer[1]);
     req.email = <string>req.authInfo.token["email"];
     if (!req.email) {
       throw new Error("Invalid session JWT");
@@ -99,13 +104,12 @@ app.use(authMiddleware);
 
 // Handle retrieving of the notes
 app.get("/api/notes", async (req, res) => {
-
-  const authzSchema = await descopeClient.management.authz.loadSchema();
   // First, make sure to identify all the notes we have access to (viewer permission)
   // This is done for us by Descope ReBAC
-  const allRelations = await descopeClient.management.authz.whatCanTargetAccess(
+  const allRelations = await descope.management.authz.whatCanTargetAccess(
     req.email!,
   );
+
   // Filter only notes with can_view permissions
   const ids = allRelations.data
     ?.filter(
@@ -130,13 +134,14 @@ app.post("/api/notes", async (req, res) => {
   try {
     const note = await db.insertNote(title, content);
     // Make sure to create the note owner permission in Descope ReBAC
-    await descopeClient.management.authz.createRelations([
+    await descope.management.fga.createRelations([
       {
         resource: note.id,
-        relationDefinition: "owner",
-        namespace: "note",
-        target: req.email,
-      },
+        resourceType: "note",
+        relation: "owner",
+        target: req.email!,
+        targetType: "user",
+      }
     ]);
     res.json(note);
   } catch (error) {
@@ -156,16 +161,17 @@ app.put("/api/notes/:id", async (req, res) => {
 
   try {
     // First, check if user has can_edit permission on the note
-    // Meaning they are either an editor or owner
-    const authorized = await descopeClient.management.authz.hasRelations([
+    const authorized = await descope.management.fga.check([
       {
         resource: req.params.id,
-        relationDefinition: "can_edit",
-        namespace: "note",
+        resourceType: "note",
+        relation: "can_edit",
+        targetType: "user",
         target: req.email!,
-      },
-    ]);
-    if (authorized.data && authorized.data[0].hasRelation) {
+      }
+    ])
+    console.log(authorized.data)
+    if (authorized.data && authorized.data[0].allowed) {
       // If so, update in the DB
       const note = await db.updateNote({
         id: req.params.id,
@@ -190,18 +196,20 @@ app.put("/api/notes/:id", async (req, res) => {
 app.delete("/api/notes/:id", async (req, res) => {
   try {
     // First, check if user is the owner of the note
-    const authorized = await descopeClient.management.authz.hasRelations([
+    const authorized = await descope.management.fga.check([
       {
         resource: req.params.id,
-        relationDefinition: "owner",
-        namespace: "note",
+        resourceType: "note",
+        relation: "owner",
+        targetType: "user",
         target: req.email!,
-      },
-    ]);
-    if (authorized.data && authorized.data[0].hasRelation) {
+      }
+    ])
+
+    if (authorized.data && authorized.data[0].allowed) {
       // If so, delete it in the DB and in Descope ReBAC
       await db.deleteNote(req.params.id);
-      await descopeClient.management.authz.deleteRelationsForResources([
+      await descope.management.authz.deleteRelationsForResources([
         req.params.id,
       ]);
       res.status(204).send();
@@ -234,18 +242,19 @@ app.post("/api/notes/:id/share", async (req, res) => {
 
   try {
     // Only owners can share with others
-    const authorized = await descopeClient.management.authz.hasRelations([
+    const authorized = await descope.management.fga.check([
       {
         resource: req.params.id,
-        relationDefinition: "owner",
-        namespace: "note",
+        resourceType: "note",
+        relation: "owner",
+        targetType: "user",
         target: req.email!,
-      },
-    ]);
-    if (authorized.data && authorized.data[0].hasRelation) {
+      }
+    ])
+    if (authorized.data && authorized.data[0].allowed) {
       if (email) {
         // Create the relation for the target email
-        await descopeClient.management.authz.createRelations([
+        await descope.management.authz.createRelations([
           {
             resource: req.params.id,
             relationDefinition: role,
@@ -258,16 +267,15 @@ app.post("/api/notes/:id/share", async (req, res) => {
         const g = await db.loadGroup(req.authInfo?.token.sub!, group);
         // Create the relation between note and group via targetSet
         // Basically, anyone who is member of the group will have access to the note
-        await descopeClient.management.authz.createRelations([
+        await descope.management.fga.createRelations([
           {
             resource: req.params.id,
-            relationDefinition: role,
-            namespace: "note",
-            targetSetResource: g.id,
-            targetSetRelationDefinition: "member",
-            targetSetRelationDefinitionNamespace: "group",
-          },
-        ]);
+            resourceType: "note",
+            relation: role,
+            targetType: "group",
+            target: g.id,
+          }
+        ])
       }
       res.status(204).send();
     } else {
@@ -330,7 +338,7 @@ app.delete("/api/groups/:id", async (req, res) => {
     // Delete in the DB
     await db.deleteGroup(group.id, group.owner);
     // Delete the relations for the group
-    await descopeClient.management.authz.deleteRelationsForResources([
+    await descope.management.authz.deleteRelationsForResources([
       group.id,
     ]);
     res.status(204).send();
@@ -350,18 +358,19 @@ app.post("/api/groups/:id/add", async (req, res) => {
     // Make sure that the group exists and the user is the owner
     const group = await db.loadGroup(req.authInfo?.token.sub!, req.params.id);
     // Check if the relation already exists
-    const exists = await descopeClient.management.authz.hasRelations([
+    const exists = await descope.management.fga.check([
       {
         resource: group.id,
-        relationDefinition: "member",
-        namespace: "group",
+        resourceType: "group",
+        relation: "member",
+        targetType: "user",
         target: req.email!,
-      },
-    ]);
-    if (!exists.data || !exists.data[0].hasRelation) {
+      }
+    ])
+    if (!exists.data || !exists.data[0].allowed) {
       // If not, create the membership relation between given email and group
       // Emails are never stored in our DB, only in Descope
-      await descopeClient.management.authz.createRelations([
+      await descope.management.authz.createRelations([
         {
           resource: group.id,
           relationDefinition: "member",
@@ -389,17 +398,26 @@ app.post("/api/groups/:id/remove", async (req, res) => {
     // Make sure that the group exists and the user is the owner
     const group = await db.loadGroup(req.authInfo?.token.sub!, req.params.id);
     // Check if the relation already exists
-    const exists = await descopeClient.management.authz.hasRelations([
+    // const exists = await descope.management.authz.hasRelations([
+    //   {
+    //     resource: group.id,
+    //     relationDefinition: "member",
+    //     namespace: "group",
+    //     target: req.email!,
+    //   },
+    // ]);
+    const exists = await descope.management.fga.check([
       {
         resource: group.id,
-        relationDefinition: "member",
-        namespace: "group",
-        target: req.email!,
-      },
-    ]);
-    if (exists.data && exists.data[0].hasRelation) {
+        resourceType: "group",
+        relation: "member",
+        targetType: "user",
+        target: email,
+      }
+    ])
+    if (exists.data && exists.data[0].allowed) {
       // If exists, remove the membership relation between given email and group
-      await descopeClient.management.authz.deleteRelations([
+      await descope.management.authz.deleteRelations([
         {
           resource: group.id,
           relationDefinition: "member",
@@ -420,7 +438,7 @@ app.get("/api/groups/:id/members", async (req, res) => {
   // Make sure the group exists and the user is the owner
   const group = await db.loadGroup(req.authInfo?.token.sub!, req.params.id);
   // Retrieve the targets of the "member" relation definition for this group
-  const members = await descopeClient.management.authz.whoCanAccess(
+  const members = await descope.management.authz.whoCanAccess(
     group.id,
     "member",
     "group",
