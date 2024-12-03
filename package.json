@@ -27,7 +27,7 @@
   },
   "homepage": "https://github.com/descope-sample-apps/notes-rebac#readme",
   "dependencies": {
-    "concurrently": "^7.6.0"
+    "concurrently": "^9.0.0"
   },
   "devDependencies": {
     "husky": "^9.0.0",
