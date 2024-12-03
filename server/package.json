@@ -22,7 +22,7 @@
     "typescript": "^5.3.2"
   },
   "dependencies": {
-    "@descope/node-sdk": "^0.0.0-next-f7306d67-20231127",
+    "@descope/node-sdk": "^0.0.0-next-7efbe81f-20241126",
     "@types/pg": "^8.10.9",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
