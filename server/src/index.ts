@@ -398,14 +398,6 @@ app.post("/api/groups/:id/remove", async (req, res) => {
     // Make sure that the group exists and the user is the owner
     const group = await db.loadGroup(req.authInfo?.token.sub!, req.params.id);
     // Check if the relation already exists
-    // const exists = await descope.management.authz.hasRelations([
-    //   {
-    //     resource: group.id,
-    //     relationDefinition: "member",
-    //     namespace: "group",
-    //     target: req.email!,
-    //   },
-    // ]);
     const exists = await descope.management.fga.check([
       {
         resource: group.id,
